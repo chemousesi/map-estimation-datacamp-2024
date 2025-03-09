@@ -7,3 +7,6 @@ physiocurve
 h5py
 tables
 osfclient
+skada
+catboost
+xgboost

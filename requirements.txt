@@ -10,3 +10,4 @@ osfclient
 skada
 catboost
 xgboost
+pywt

@@ -36,8 +36,8 @@ def get_estimator():
         make_column_transformer(
             (
                 "passthrough",
-                ["age", "gender_code", "ecg_mean", 
-                "ppg_mean", "var_ecg", "var_ppg"],
+                ["age", "gender_code", "ecg_mean",
+                 "ppg_mean", "var_ecg", "var_ppg"],
             )
         ),
         IgnoreDomain(

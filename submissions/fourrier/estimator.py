@@ -73,10 +73,11 @@ def get_estimator():
             ("passthrough", [
                 "age", "gender_code", "ecg_mean", "ppg_mean",
                 "var_ecg", "var_ppg",
-                "ecg_dominant_freq", "ppg_dominant_freq", 
+                "ecg_dominant_freq", "ppg_dominant_freq",
                 "ecg_auc", "ppg_auc",
                 "ppg_slope", "ppg_acceleration"
             ])
         ),
-        IgnoreDomain(n_estimators=15, max_depth=20, min_samples_leaf=3, random_state=42)
+        IgnoreDomain(n_estimators=15, max_depth=20,
+                     min_samples_leaf=3, random_state=42)
     )

@@ -1,5 +1,9 @@
 from catboost import CatBoostRegressor
-from sklearn.base import BaseEstimator, RegressorMixin, TransformerMixin
+from sklearn.base import (
+    BaseEstimator,
+    RegressorMixin,
+    TransformerMixin,
+)
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.impute import SimpleImputer
@@ -12,6 +16,7 @@ set_config(transform_output="pandas")
 # Step 1: Data Filtering and Preprocessing Transformers
 ###############################################################################
 
+
 class DomainFilter(BaseEstimator, TransformerMixin):
     def __init__(self, target_domain='v'):
         self.target_domain = target_domain
@@ -22,6 +27,7 @@ class DomainFilter(BaseEstimator, TransformerMixin):
     def transform(self, X):
         X = X.copy()
         return X[X['domain'] == self.target_domain]
+
 
 class DataFrameCleanerCatBoost(BaseEstimator, TransformerMixin):
     def fit(self, X, y=None):
@@ -37,9 +43,11 @@ class DataFrameCleanerCatBoost(BaseEstimator, TransformerMixin):
         X = X.drop(['ecg', 'ppg'], axis=1)
         return X
 
+
 ###############################################################################
 # Step 2: CatBoost Wrapper that Ignores Invalid Targets
 ###############################################################################
+
 
 class IgnoreDomainCatBoost(BaseEstimator, RegressorMixin):
     def __init__(self, catboost_params=None, cat_features=None):
@@ -48,7 +56,7 @@ class IgnoreDomainCatBoost(BaseEstimator, RegressorMixin):
         self.model_ = None
 
     def fit(self, X, y):
-        mask = (y != -1)
+        mask = y != -1
         X = X[mask]
         y = y[mask]
         self.model_ = CatBoostRegressor(**self.catboost_params)
@@ -59,24 +67,30 @@ class IgnoreDomainCatBoost(BaseEstimator, RegressorMixin):
         check_is_fitted(self, "model_")
         return self.model_.predict(X)
 
+
 ###############################################################################
 # Step 3: Build the Pipeline
 ###############################################################################
+
 
 def get_estimator():
     numeric_features = ["age", "ecg_mean", "ppg_mean", "var_ecg", "var_ppg"]
     categorical_features = ["gender"]
 
-    numeric_transformer = Pipeline([
-        ("imputer", SimpleImputer(strategy="mean"))
-    ])
+    numeric_transformer = Pipeline(
+        [("imputer", SimpleImputer(strategy="mean"))]
+    )
 
-    preprocessor = ColumnTransformer([
-        ("num", numeric_transformer, numeric_features),
-        ("cat", "passthrough", categorical_features),
-    ])
+    preprocessor = ColumnTransformer(
+        [
+            ("num", numeric_transformer, numeric_features),
+            ("cat", "passthrough", categorical_features),
+        ]
+    )
 
-    cat_feature_indices = list(range(len(numeric_features), len(numeric_features) + len(categorical_features)))
+    cat_feature_indices = list(
+        range(len(numeric_features), len(numeric_features) + len(categorical_features))
+    )
 
     catboost_params = {
         "iterations": 200,
@@ -85,13 +99,18 @@ def get_estimator():
         "random_seed": 42,
     }
 
-    pipeline = Pipeline([
-        ("cleaner", DataFrameCleanerCatBoost()),
-        ("preprocessor", preprocessor),
-        ("catboost", IgnoreDomainCatBoost(
-            catboost_params=catboost_params,
-            cat_features=cat_feature_indices
-        ))
-    ])
+    pipeline = Pipeline(
+        [
+            ("cleaner", DataFrameCleanerCatBoost()),
+            ("preprocessor", preprocessor),
+            (
+                "catboost",
+                IgnoreDomainCatBoost(
+                    catboost_params=catboost_params,
+                    cat_features=cat_feature_indices,
+                ),
+            ),
+        ]
+    )
 
     return pipeline

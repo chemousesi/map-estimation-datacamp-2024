@@ -1,4 +1,3 @@
-import pywt
 from sklearn import set_config
 from sklearn.pipeline import make_pipeline
 from sklearn.compose import make_column_transformer
@@ -8,6 +7,7 @@ import numpy as np
 import pandas as pd
 
 set_config(transform_output="pandas")
+
 
 class DataFrameCleaner(BaseEstimator, TransformerMixin):
     def fit(self, X, y=None):
@@ -32,13 +32,13 @@ class DataFrameCleaner(BaseEstimator, TransformerMixin):
         X['ecg_dominant_freq'] = X['ecg'].apply(dominant_frequency)
         X['ppg_dominant_freq'] = X['ppg'].apply(dominant_frequency)
 
-        def wavelet_energy(signal, wavelet='db4', level=3):
-            coeffs = pywt.wavedec(signal, wavelet, level=level)
-            energy = sum(np.linalg.norm(c)**2 for c in coeffs[1:])
-            return energy
+        # def wavelet_energy(signal, wavelet='db4', level=3):
+        #     coeffs = pywt.wavedec(signal, wavelet, level=level)
+        #     energy = sum(np.linalg.norm(c)**2 for c in coeffs[1:])
+        #     return energy
 
-        X['ecg_wavelet_energy'] = X['ecg'].apply(wavelet_energy)
-        X['ppg_wavelet_energy'] = X['ppg'].apply(wavelet_energy)
+        # X['ecg_wavelet_energy'] = X['ecg'].apply(wavelet_energy)
+        # X['ppg_wavelet_energy'] = X['ppg'].apply(wavelet_energy)
 
         def compute_auc(signal):
             return np.trapz(signal, dx=1/100)
@@ -51,10 +51,13 @@ class DataFrameCleaner(BaseEstimator, TransformerMixin):
             second_derivative = np.gradient(first_derivative, 1/100)
             return first_derivative.mean(), second_derivative.mean()
 
-        X[['ppg_slope', 'ppg_acceleration']] = X['ppg'].apply(lambda x: compute_derivatives(x)).apply(pd.Series)
+        X[['ppg_slope', 'ppg_acceleration']] = X['ppg'].apply(
+            lambda x: compute_derivatives(x)
+        ).apply(pd.Series)
 
         X = X.drop(['ecg', 'ppg'], axis=1)
         return X
+
 
 class IgnoreDomain(RandomForestRegressor):
     def fit(self, X, y):
@@ -62,15 +65,16 @@ class IgnoreDomain(RandomForestRegressor):
         y = y[y != -1]
         return super().fit(X, y)
 
+
 def get_estimator():
     return make_pipeline(
         DataFrameCleaner(),
         make_column_transformer(
-            ("passthrough", ["age", "gender_code", "ecg_mean", "ppg_mean", "var_ecg", 
-                             "var_ppg", "ecg_dominant_freq", "ppg_dominant_freq", 
-                             "ecg_wavelet_energy", "ppg_wavelet_energy",
-                             "ecg_auc", "ppg_auc",
-                             "ppg_slope", "ppg_acceleration"])
+            ("passthrough", [
+                "age", "gender_code", "ecg_mean", "ppg_mean", "var_ecg", "var_ppg",
+                "ecg_dominant_freq", "ppg_dominant_freq", "ecg_auc", "ppg_auc",
+                "ppg_slope", "ppg_acceleration"
+            ])
         ),
         IgnoreDomain(n_estimators=15, max_depth=20, min_samples_leaf=3, random_state=42)
     )

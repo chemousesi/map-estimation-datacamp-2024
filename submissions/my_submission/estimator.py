@@ -4,16 +4,14 @@ from sklearn import set_config
 from sklearn.pipeline import make_pipeline
 from sklearn.compose import make_column_transformer
 from sklearn.ensemble import RandomForestRegressor
-from sklearn.preprocessing import OrdinalEncoder
 from sklearn.base import BaseEstimator, TransformerMixin
-from xgboost import XGBRegressor
-
 
 set_config(transform_output="pandas")
 
 class DataFrameCleaner(BaseEstimator, TransformerMixin):
     def fit(self, X, y=None):
         return self
+
     def transform(self, X):
         X = X.copy()
         X['gender_code'] = X['gender'].map({'M': 0, 'F': 1})

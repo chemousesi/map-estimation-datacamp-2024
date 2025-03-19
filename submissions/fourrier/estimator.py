@@ -3,9 +3,7 @@ from sklearn import set_config
 from sklearn.pipeline import make_pipeline
 from sklearn.compose import make_column_transformer
 from sklearn.ensemble import RandomForestRegressor
-from sklearn.preprocessing import OrdinalEncoder
 from sklearn.base import BaseEstimator, TransformerMixin
-from xgboost import XGBRegressor
 import numpy as np
 import pandas as pd
 

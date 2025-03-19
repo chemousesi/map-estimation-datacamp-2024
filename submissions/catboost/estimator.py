@@ -1,5 +1,3 @@
-import numpy as np
-import pandas as pd
 from catboost import CatBoostRegressor
 from sklearn.base import BaseEstimator, RegressorMixin, TransformerMixin
 from sklearn.pipeline import Pipeline

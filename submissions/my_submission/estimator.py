@@ -36,10 +36,12 @@ def get_estimator():
         make_column_transformer(
             (
                 "passthrough",
-                ["age", "gender_code", "ecg_mean", "ppg_mean", "var_ecg", "var_ppg"],
+                ["age", "gender_code", "ecg_mean", 
+                "ppg_mean", "var_ecg", "var_ppg"],
             )
         ),
         IgnoreDomain(
-            n_estimators=15, max_depth=20, min_samples_leaf=3, random_state=42
+            n_estimators=15, max_depth=20,
+            min_samples_leaf=3, random_state=42
         ),
     )

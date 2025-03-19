@@ -71,8 +71,10 @@ def get_estimator():
         DataFrameCleaner(),
         make_column_transformer(
             ("passthrough", [
-                "age", "gender_code", "ecg_mean", "ppg_mean", "var_ecg", "var_ppg",
-                "ecg_dominant_freq", "ppg_dominant_freq", "ecg_auc", "ppg_auc",
+                "age", "gender_code", "ecg_mean", "ppg_mean",
+                "var_ecg", "var_ppg",
+                "ecg_dominant_freq", "ppg_dominant_freq", 
+                "ecg_auc", "ppg_auc",
                 "ppg_slope", "ppg_acceleration"
             ])
         ),

@@ -89,7 +89,8 @@ def get_estimator():
     )
 
     cat_feature_indices = list(
-        range(len(numeric_features), len(numeric_features) + len(categorical_features))
+        range(len(numeric_features), len(numeric_features) + 
+              len(categorical_features))
     )
 
     catboost_params = {

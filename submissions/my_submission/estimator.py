@@ -1,5 +1,3 @@
-# %load submissions/starting_kit/estimator.py
-
 from sklearn import set_config
 from sklearn.pipeline import make_pipeline
 from sklearn.compose import make_column_transformer
